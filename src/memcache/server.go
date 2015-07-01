@@ -167,6 +167,7 @@ func (s *Server) Serve() (e error) {
         c := newServerConn(rw)
         go func() {
             s.Lock()
+            // RemoteAddr包括ip port，是唯一的
             s.conns[c.RemoteAddr] = c
             s.stats.curr_connections++
             s.stats.total_connections++

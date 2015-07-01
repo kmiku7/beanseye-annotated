@@ -42,6 +42,7 @@ func NewModScheduler(hosts []string, hashname string) Scheduler {
     return &c
 }
 
+// 返回一个，没NRW啥事
 func (c *ModScheduler) GetHostsByKey(key string) []*Host {
     h := c.hashMethod([]byte(key))
     r := make([]*Host, 1)
@@ -49,6 +50,7 @@ func (c *ModScheduler) GetHostsByKey(key string) []*Host {
     return r
 }
 
+// n台机器，返回每个key落到哪台机器里。
 func (c *ModScheduler) DivideKeysByBucket(keys []string) [][]string {
     n := len(c.hosts)
     rs := make([][]string, n)
@@ -69,6 +71,8 @@ func (c *ModScheduler) Stats() map[string][]float64 {
     return r
 }
 
+// 一个uint64数组结构
+// 带一些操作
 type uint64Slice []uint64
 
 func (l uint64Slice) Len() int {
@@ -105,9 +109,11 @@ func NewConsistantHashScheduler(hosts []string, hashname string) Scheduler {
             ps := strings.SplitN(h, ":", 2)
             host := ps[0]
             port := ps[1]
+            // 11211 这个端口有什么特殊？
             if port == "11211" {
                 v = c.hashMethod([]byte(fmt.Sprintf("%s-%d", host, j)))
             }
+            // 缓冲hash值
             c.index[i*VIRTUAL_NODES+j] = (uint64(v) << 32) + uint64(i)
         }
     }
@@ -178,6 +184,8 @@ func NewManualScheduler(config map[string][]string, bs, n int) *ManualScheduler 
         c.hosts[no] = host
         for _, bucket_str := range serve_to {
             if strings.HasPrefix(bucket_str, "-") {
+                // serve_to指定加入哪些桶
+                // 以负号开头的作为backup插入
                 if bucket, e := strconv.ParseInt(bucket_str[1:], 16, 16); e == nil {
                     //c.buckets[bucket] = append(c.buckets[bucket], no)
                     c.backups[bucket] = append(c.backups[bucket], no)
@@ -200,6 +208,7 @@ func NewManualScheduler(config map[string][]string, bs, n int) *ManualScheduler 
         c.stats[b] = make([]float64, len(c.hosts))
     }
     c.hashMethod = fnv1a1
+    // 计算最高位1的位置
     c.bucketWidth = calBitWidth(bs)
 
     go c.procFeedback()
@@ -353,6 +362,11 @@ func (c *ManualScheduler) Stats() map[string][]float64 {
     }
     return r
 }
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 type Feedback struct {
     hostIndex   int

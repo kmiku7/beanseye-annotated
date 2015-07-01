@@ -23,6 +23,7 @@ import (
 	"sort"
 )
 
+// 命令行参数
 var conf *string = flag.String("conf", "conf/example.yaml", "config path")
 
 //var debug *bool = flag.Bool("debug", false, "debug info")
@@ -440,12 +441,15 @@ func main() {
 	server_configs := make(map[string][]string, len(eyeconfig.Servers))
 	for _, server := range eyeconfig.Servers {
 		fields := strings.Split(server, " ")
+		// 格式是这样的
+		// 127.0.0.1:7900 A -1 B
 		server_configs[fields[0]] = fields[1:]
 	}
 	servers := make([]string, 0, len(server_configs))
 	for server, _ := range server_configs {
 		servers = append(servers, server)
 	}
+	// 为啥又给主机排序? 有什么用?
 	sort.Sort(sort.StringSlice(servers))
 
 	if eyeconfig.WebPort <= 0 {

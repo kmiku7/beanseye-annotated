@@ -1,5 +1,6 @@
 package main
 
+// yaml格式也需要有预定义的结构体
 type Eye struct {
 	Servers   []string
 	Port      int

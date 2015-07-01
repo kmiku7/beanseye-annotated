@@ -140,6 +140,7 @@ func (req *Request) Read(b *bufio.Reader) (e error) {
         if len(parts) < 5 || len(parts) > 7 {
             return errors.New("invalid cmd")
         }
+        // 应为这个参数是一个slice！
         req.Keys = parts[1:2]
         req.Item = &Item{}
         item := req.Item
